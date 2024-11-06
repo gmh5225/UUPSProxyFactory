@@ -3,7 +3,8 @@ pragma solidity ^0.8.28;
 
 import { Test } from "forge-std/Test.sol";
 import { console2 } from "forge-std/console2.sol";
-import { UUPSProxyFactory } from "../src/UUPSProxyFactory.sol";
+// import { UUPSProxyFactory } from "../src/UUPSProxyFactory.sol";
+import { IUUPSProxyFactory } from "../src/interface/IUUPSProxyFactory.sol";
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
@@ -55,7 +56,8 @@ contract TestImplementationV2 is Initializable, UUPSUpgradeable, OwnableUpgradea
 contract UUPSProxyFactoryTest is Test {
     bytes32 salt = keccak256(abi.encodePacked("salt"));
 
-    UUPSProxyFactory factory;
+    // UUPSProxyFactory factory;
+    IUUPSProxyFactory factory;
     TestImplementation implementation;
     TestImplementationV2 implementationV2;
 
@@ -63,7 +65,8 @@ contract UUPSProxyFactoryTest is Test {
     address bob = makeAddr("bob");
 
     function setUp() public {
-        factory = new UUPSProxyFactory();
+        // factory = new UUPSProxyFactory();
+        factory = IUUPSProxyFactory(deployCode("../src/abi/UUPSProxyFactory.sol:UUPSProxyFactory"));
         implementation = new TestImplementation();
         implementationV2 = new TestImplementationV2();
     }
