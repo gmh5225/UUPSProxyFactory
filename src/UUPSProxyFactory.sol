@@ -10,10 +10,26 @@ contract UUPSProxyFactory {
     error InvalidImplementation();
     error ProxyAlreadyExists();
     error NotUUPSImplementation();
-    error EmptyInitData();
+    error InvalidInitData();
+    error ImplementationNotContract();
 
     // events
     event ProxyDeployed(address indexed deployer, address indexed proxy, address indexed implementation, bytes32 salt);
+
+    /// @notice Deploy a new proxy contract with auto-generated salt
+    /// @param implementation The implementation contract address
+    /// @param initData The initialization data
+    /// @return proxy The deployed proxy contract address
+    function deployProxyWithAutoSalt(
+        address implementation,
+        bytes calldata initData
+    )
+        external
+        returns (address proxy)
+    {
+        bytes32 salt = keccak256(abi.encodePacked(implementation, initData, msg.sender, block.timestamp));
+        return deployProxy(implementation, initData, salt);
+    }
 
     /// @notice Deploy a new proxy contract
     /// @param implementation The implementation contract address
@@ -25,31 +41,40 @@ contract UUPSProxyFactory {
         bytes calldata initData,
         bytes32 salt
     )
-        external
+        public
         returns (address proxy)
     {
-        // Check if implementation address is valid
         if (implementation == address(0)) revert InvalidImplementation();
-
-        // Check if implementation is UUPS compatible
+        if (implementation.code.length == 0) revert ImplementationNotContract();
         if (!_isUUPSContract(implementation)) revert NotUUPSImplementation();
+        if (initData.length < 4) revert InvalidInitData();
 
-        // Check if proxy contract already exists
         address predictedAddress = predictProxyAddress(implementation, initData, salt);
         if (predictedAddress.code.length > 0) revert ProxyAlreadyExists();
 
-        // Check if initialization data is not empty
-        if (initData.length == 0) revert EmptyInitData();
-
         // Deploy proxy contract with user provided salt
         proxy = address(new ERC1967Proxy{ salt: salt }(implementation, initData));
-        if (proxy == address(0)) revert ProxyDeployFailed();
+        if (proxy == address(0) || proxy.code.length == 0) revert ProxyDeployFailed();
 
-        // Verify the proxy was deployed successfully
-        if (proxy.code.length == 0) revert ProxyDeployFailed();
-
-        // Emit event
         emit ProxyDeployed(msg.sender, proxy, implementation, salt);
+    }
+
+    /// @notice Check if a proxy is already deployed
+    /// @param implementation The implementation contract address
+    /// @param initData The initialization data
+    /// @param salt The salt value
+    /// @return isDeployed True if proxy is already deployed
+    function isProxyDeployed(
+        address implementation,
+        bytes calldata initData,
+        bytes32 salt
+    )
+        external
+        view
+        returns (bool isDeployed)
+    {
+        address predictedAddress = predictProxyAddress(implementation, initData, salt);
+        return predictedAddress.code.length > 0;
     }
 
     /// @notice Predict the proxy contract address before deployment
@@ -66,12 +91,11 @@ contract UUPSProxyFactory {
         view
         returns (address predicted)
     {
-        bytes memory creationCode = type(ERC1967Proxy).creationCode;
-        bytes memory bytecode = abi.encodePacked(creationCode, abi.encode(implementation, initData));
+        bytes32 bytecodeHash =
+            keccak256(abi.encodePacked(type(ERC1967Proxy).creationCode, abi.encode(implementation, initData)));
 
-        bytes32 hash = keccak256(abi.encodePacked(bytes1(0xff), address(this), salt, keccak256(bytecode)));
-
-        predicted = address(uint160(uint256(hash)));
+        predicted =
+            address(uint160(uint256(keccak256(abi.encodePacked(bytes1(0xff), address(this), salt, bytecodeHash)))));
     }
 
     /// @notice Check if the contract is UUPS compatible
