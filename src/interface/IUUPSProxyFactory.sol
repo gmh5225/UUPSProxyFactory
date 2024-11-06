@@ -19,7 +19,9 @@ interface IUUPSProxyFactory {
     function deployProxyWithAutoSalt(
         address implementation,
         bytes calldata initData
-    ) external returns (address proxy);
+    )
+        external
+        returns (address proxy);
 
     /// @notice Deploy a new proxy contract
     /// @param implementation The implementation contract address
@@ -30,7 +32,9 @@ interface IUUPSProxyFactory {
         address implementation,
         bytes calldata initData,
         bytes32 salt
-    ) external returns (address proxy);
+    )
+        external
+        returns (address proxy);
 
     /// @notice Check if a proxy is already deployed
     /// @param implementation The implementation contract address
@@ -41,7 +45,10 @@ interface IUUPSProxyFactory {
         address implementation,
         bytes calldata initData,
         bytes32 salt
-    ) external view returns (bool isDeployed);
+    )
+        external
+        view
+        returns (bool isDeployed);
 
     /// @notice Predict the proxy contract address before deployment
     /// @param implementation The implementation contract address
@@ -52,5 +59,8 @@ interface IUUPSProxyFactory {
         address implementation,
         bytes calldata initData,
         bytes32 salt
-    ) external view returns (address predicted);
-} 
+    )
+        external
+        view
+        returns (address predicted);
+}
