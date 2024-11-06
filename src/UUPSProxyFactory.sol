@@ -50,7 +50,7 @@ contract UUPSProxyFactory {
         if (initData.length < 4) revert InvalidInitData();
 
         address predictedAddress = predictProxyAddress(implementation, initData, salt);
-        if (predictedAddress.code.length > 0) revert ProxyAlreadyExists();
+        if (predictedAddress.code.length != 0) revert ProxyAlreadyExists();
 
         // Deploy proxy contract with user provided salt
         proxy = address(new ERC1967Proxy{ salt: salt }(implementation, initData));
@@ -74,7 +74,7 @@ contract UUPSProxyFactory {
         returns (bool isDeployed)
     {
         address predictedAddress = predictProxyAddress(implementation, initData, salt);
-        return predictedAddress.code.length > 0;
+        return predictedAddress.code.length != 0;
     }
 
     /// @notice Predict the proxy contract address before deployment
