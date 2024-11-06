@@ -1,0 +1,18 @@
+{
+    "[solidity]": {
+      "editor.defaultFormatter": "JuanBlanco.solidity"
+    },
+    "[toml]": {
+      "editor.defaultFormatter": "tamasfe.even-better-toml"
+    },
+    "solidity.formatter": "forge",
+    "solidity.packageDefaultDependenciesContractsDirectory": "src",
+    "solidity.packageDefaultDependenciesDirectory": "lib",
+    "solidity.remappings": [
+        "@openzeppelin/=lib/openzeppelin-contracts/",
+        "@openzeppelin-upgradeable/=lib/openzeppelin-contracts-upgradeable/",
+        "@solmate/=lib/solmate/src/",
+        "@permit2-light-sdk/=lib/permit2-light-sdk/",
+        "@forge/=lib/forge-std/src/"
+    ]
+}
