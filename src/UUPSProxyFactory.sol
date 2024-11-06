@@ -3,8 +3,9 @@ pragma solidity ^0.8.28;
 
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import { IUUPSProxyFactory } from "./interface/IUUPSProxyFactory.sol";
 
-contract UUPSProxyFactory {
+contract UUPSProxyFactory is IUUPSProxyFactory {
     // custom errors
     error ProxyDeployFailed();
     error InvalidImplementation();
