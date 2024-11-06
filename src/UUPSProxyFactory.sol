@@ -11,7 +11,6 @@ contract UUPSProxyFactory {
     error ProxyAlreadyExists();
     error NotUUPSImplementation();
     error InvalidInitData();
-    error ImplementationNotContract();
 
     // events
     event ProxyDeployed(address indexed deployer, address indexed proxy, address indexed implementation, bytes32 salt);
