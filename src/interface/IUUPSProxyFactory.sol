@@ -1,17 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+// Factory address: 0x642265eDC037e230E78C5c4443F294EE00fCe05E
 interface IUUPSProxyFactory {
-    // custom errors
-    error ProxyDeployFailed();
-    error InvalidImplementation();
-    error ProxyAlreadyExists();
-    error NotUUPSImplementation();
-    error InvalidInitData();
-
-    // events
-    event ProxyDeployed(address indexed deployer, address indexed proxy, address indexed implementation, bytes32 salt);
-
     /// @notice Deploy a new proxy contract with auto-generated salt
     /// @param implementation The implementation contract address
     /// @param initData The initialization data
