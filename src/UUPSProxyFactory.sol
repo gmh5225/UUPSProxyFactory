@@ -44,10 +44,13 @@ contract UUPSProxyFactory {
         public
         returns (address proxy)
     {
-        if (implementation == address(0)) revert InvalidImplementation();
-        if (implementation.code.length == 0) revert ImplementationNotContract();
+        if (implementation == address(0) || implementation.code.length == 0) {
+            revert InvalidImplementation();
+        }
+        unchecked {
+            if (initData.length < 4) revert InvalidInitData();
+        }
         if (!_isUUPSContract(implementation)) revert NotUUPSImplementation();
-        if (initData.length < 4) revert InvalidInitData();
 
         address predictedAddress = predictProxyAddress(implementation, initData, salt);
         if (predictedAddress.code.length != 0) revert ProxyAlreadyExists();
