@@ -53,6 +53,8 @@ contract TestImplementationV2 is Initializable, UUPSUpgradeable, OwnableUpgradea
 }
 
 contract UUPSProxyFactoryTest is Test {
+    bytes32 salt = keccak256(abi.encodePacked("salt"));
+
     UUPSProxyFactory factory;
     TestImplementation implementation;
     TestImplementationV2 implementationV2;
@@ -73,12 +75,24 @@ contract UUPSProxyFactoryTest is Test {
 
         vm.startPrank(alice);
 
-        address proxy = factory.deployProxyWithAutoSalt(address(implementation), initData);
+        bool isDeployed = factory.isProxyDeployed(address(implementation), initData, salt);
+        console2.log("Is proxy deployed:", isDeployed);
+        assertEq(isDeployed, false, "Proxy should not be deployed before deployment");
+
+        address proxy = factory.deployProxy(address(implementation), initData, salt);
+
+        bool isDeployedAfter = factory.isProxyDeployed(address(implementation), initData, salt);
+        console2.log("Is proxy deployed after:", isDeployedAfter);
+        assertEq(isDeployedAfter, true, "Proxy should be deployed after deployment");
+
+        address predictedProxy = factory.predictProxyAddress(address(implementation), initData, salt);
 
         assertTrue(proxy != address(0), "Proxy deployment failed");
         assertTrue(proxy.code.length > 0, "Proxy has no code");
+        assertTrue(proxy == predictedProxy, "Proxy address mismatch");
 
         console2.log("Proxy address:", proxy);
+        console2.log("Predicted proxy address:", predictedProxy);
 
         TestImplementation impl = TestImplementation(proxy);
 
