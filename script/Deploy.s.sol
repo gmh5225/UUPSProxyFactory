@@ -17,7 +17,7 @@ contract DeployScript is Script {
 
         // deploy
         UUPSProxyFactory factory = new UUPSProxyFactory{ salt: SALT }();
-        // deployed at: 0x6CeF682028A46015462b176c6F36d2BCb19515EE
+        // deployed at: 0x642265eDC037e230E78C5c4443F294EE00fCe05E
         console2.log("UUPSProxyFactory deployed at:", address(factory));
 
         // stop broadcast
