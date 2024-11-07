@@ -8,6 +8,8 @@ import { IUUPSProxyFactory } from "../src/interface/IUUPSProxyFactory.sol";
 import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/ReentrancyGuardUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/PausableUpgradeable.sol";
 
 contract TestImplementation is Initializable, UUPSUpgradeable, OwnableUpgradeable {
     uint256 public value;
@@ -31,7 +33,13 @@ contract TestImplementation is Initializable, UUPSUpgradeable, OwnableUpgradeabl
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner { }
 }
 
-contract TestImplementationV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable {
+contract TestImplementationV2 is
+    Initializable,
+    UUPSUpgradeable,
+    OwnableUpgradeable,
+    ReentrancyGuardUpgradeable,
+    PausableUpgradeable
+{
     uint256 public value;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -45,12 +53,20 @@ contract TestImplementationV2 is Initializable, UUPSUpgradeable, OwnableUpgradea
         value = _value;
     }
 
-    function setValue(uint256 _value) public {
+    function setValue(uint256 _value) public nonReentrant whenNotPaused {
         value = _value;
     }
 
     // authorize upgrade(only owner)
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner { }
+
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
+    }
 }
 
 contract UUPSProxyFactoryTest is Test {
@@ -119,5 +135,18 @@ contract UUPSProxyFactoryTest is Test {
         TestImplementationV2 implV2 = TestImplementationV2(proxy);
         implV2.setValue(200);
         assertEq(implV2.value(), 200, "Upgrade failed");
+
+        // pause
+        vm.startPrank(alice);
+        implV2.pause();
+
+        vm.expectRevert(PausableUpgradeable.EnforcedPause.selector);
+        implV2.setValue(200);
+
+        // unpause
+        implV2.unpause();
+        implV2.setValue(200);
+        assertEq(implV2.value(), 200, "Upgrade failed");
+        vm.stopPrank();
     }
 }
