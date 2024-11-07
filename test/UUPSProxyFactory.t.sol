@@ -138,6 +138,30 @@ contract UUPSProxyFactoryTest is Test {
 
         address proxy = factory.deployProxy(address(implementation), initData, salt);
 
+        // proxy contract decompiled as below
+        /**
+         * // Decompiled by library.dedaub.com
+         * // 2024.11.07 09:26 UTC
+         * // Compiled using the solidity compiler version 0.8.28
+         *
+         *
+         * // Data structures and variables inferred from the use of storage instructions
+         * address ___function_selector__; //
+         * STORAGE[0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc] bytes 0 to 19
+         *
+         *
+         *
+         * // Note: The function selector is not present in the original solidity code.
+         * // However, we display it for the sake of completeness.
+         *
+         * function __function_selector__() private {
+         * MEM[64] = 128;
+         * CALLDATACOPY(0, 0, msg.data.length);
+         * v0 = ___function_selector__.delegatecall(MEM[0:msg.data.length], MEM[0:0]).gas(msg.gas);
+         * require(v0, 0, RETURNDATASIZE()); // checks call status, propagates error data on error
+         * return ;
+         * }
+         */
         bool isDeployedAfter = factory.isProxyDeployed(address(implementation), initData, salt);
         console2.log("Is proxy deployed after:", isDeployedAfter);
         assertEq(isDeployedAfter, true, "Proxy should be deployed after deployment");
