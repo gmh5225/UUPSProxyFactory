@@ -3,6 +3,20 @@ pragma solidity ^0.8.20;
 
 // Factory address: 0x642265eDC037e230E78C5c4443F294EE00fCe05E
 interface IUUPSProxyFactory {
+    /// @notice Custom error for proxy deployment failure
+    error ProxyDeployFailed();
+    /// @notice Custom error for invalid implementation
+    error InvalidImplementation();
+    /// @notice Custom error for proxy already exists
+    error ProxyAlreadyExists();
+    /// @notice Custom error for not UUPS implementation
+    error NotUUPSImplementation();
+    /// @notice Custom error for invalid initialization data
+    error InvalidInitData();
+
+    /// @notice Event emitted when a proxy is deployed
+    event ProxyDeployed(address indexed deployer, address indexed proxy, address indexed implementation, bytes32 salt);
+
     /// @notice Deploy a new proxy contract with auto-generated salt
     /// @param implementation The implementation contract address
     /// @param initData The initialization data
