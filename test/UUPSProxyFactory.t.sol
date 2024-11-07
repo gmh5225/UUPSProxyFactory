@@ -54,6 +54,42 @@ contract TestImplementationV2 is
     }
 
     function setValue(uint256 value_) public nonReentrant whenNotPaused {
+        value = value_ + 2;
+    }
+
+    // authorize upgrade(only owner)
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner { }
+
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
+    }
+}
+
+contract TestImplementationV3 is
+    Initializable,
+    UUPSUpgradeable,
+    OwnableUpgradeable,
+    ReentrancyGuardUpgradeable,
+    PausableUpgradeable
+{
+    uint256 public value;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(address initialOwner_, uint256 value_) public reinitializer(3) {
+        __Ownable_init(initialOwner_);
+        __UUPSUpgradeable_init();
+        value = value_;
+    }
+
+    function setValue(uint256 value_) public nonReentrant whenNotPaused {
         value = value_;
     }
 
@@ -76,6 +112,7 @@ contract UUPSProxyFactoryTest is Test {
     IUUPSProxyFactory factory;
     TestImplementation implementation;
     TestImplementationV2 implementationV2;
+    TestImplementationV3 implementationV3;
 
     address alice = makeAddr("alice");
     address bob = makeAddr("bob");
@@ -85,6 +122,7 @@ contract UUPSProxyFactoryTest is Test {
         factory = IUUPSProxyFactory(deployCode("../src/abi/UUPSProxyFactory.sol:UUPSProxyFactory"));
         implementation = new TestImplementation();
         implementationV2 = new TestImplementationV2();
+        implementationV3 = new TestImplementationV3();
     }
 
     function test_DeployProxyAndUpgrade() public {
@@ -134,7 +172,7 @@ contract UUPSProxyFactoryTest is Test {
 
         TestImplementationV2 implV2 = TestImplementationV2(proxy);
         implV2.setValue(200);
-        assertEq(implV2.value(), 200, "Upgrade failed");
+        assertEq(implV2.value(), 202, "Upgrade failed");
 
         // pause
         vm.startPrank(alice);
@@ -146,7 +184,20 @@ contract UUPSProxyFactoryTest is Test {
         // unpause
         implV2.unpause();
         implV2.setValue(200);
-        assertEq(implV2.value(), 200, "Upgrade failed");
+        assertEq(implV2.value(), 202, "Upgrade failed");
+        vm.stopPrank();
+
+        // upgrade to v3
+        vm.startPrank(alice);
+        TestImplementationV2(proxy).upgradeToAndCall(
+            address(implementationV3),
+            abi.encodeWithSelector(TestImplementationV3.initialize.selector, alice, uint256(100))
+        );
+
+        TestImplementationV3 implV3 = TestImplementationV3(proxy);
+        implV3.setValue(200);
+        assertEq(implV3.value(), 200, "Upgrade failed");
+
         vm.stopPrank();
     }
 }
