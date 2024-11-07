@@ -19,14 +19,14 @@ contract TestImplementation is Initializable, UUPSUpgradeable, OwnableUpgradeabl
         _disableInitializers();
     }
 
-    function initialize(address _initialOwner, uint256 _value) public initializer {
-        __Ownable_init(_initialOwner);
+    function initialize(address initialOwner_, uint256 value_) public initializer {
+        __Ownable_init(initialOwner_);
         __UUPSUpgradeable_init();
-        value = _value;
+        value = value_;
     }
 
-    function setValue(uint256 _value) public {
-        value = _value + 1;
+    function setValue(uint256 value_) public {
+        value = value_ + 1;
     }
 
     // authorize upgrade(only owner)
@@ -47,14 +47,14 @@ contract TestImplementationV2 is
         _disableInitializers();
     }
 
-    function initialize(address _initialOwner, uint256 _value) public reinitializer(2) {
-        __Ownable_init(_initialOwner);
+    function initialize(address initialOwner_, uint256 value_) public reinitializer(2) {
+        __Ownable_init(initialOwner_);
         __UUPSUpgradeable_init();
-        value = _value;
+        value = value_;
     }
 
-    function setValue(uint256 _value) public nonReentrant whenNotPaused {
-        value = _value;
+    function setValue(uint256 value_) public nonReentrant whenNotPaused {
+        value = value_;
     }
 
     // authorize upgrade(only owner)
