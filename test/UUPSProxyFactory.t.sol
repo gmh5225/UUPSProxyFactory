@@ -17,8 +17,8 @@ contract TestImplementation is Initializable, UUPSUpgradeable, OwnableUpgradeabl
         _disableInitializers();
     }
 
-    function initialize(address initialOwner, uint256 _value) public initializer {
-        __Ownable_init(initialOwner);
+    function initialize(address _initialOwner, uint256 _value) public initializer {
+        __Ownable_init(_initialOwner);
         __UUPSUpgradeable_init();
         value = _value;
     }
@@ -39,8 +39,8 @@ contract TestImplementationV2 is Initializable, UUPSUpgradeable, OwnableUpgradea
         _disableInitializers();
     }
 
-    function initialize(address initialOwner, uint256 _value) public reinitializer(2) {
-        __Ownable_init(initialOwner);
+    function initialize(address _initialOwner, uint256 _value) public reinitializer(2) {
+        __Ownable_init(_initialOwner);
         __UUPSUpgradeable_init();
         value = _value;
     }
