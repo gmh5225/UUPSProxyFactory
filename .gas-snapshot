@@ -1,3 +1,1 @@
-BankTest:testDeposit() (gas: 71335)
-BankTest:testFailWithdrawNotAdmin() (gas: 10553)
-BankTest:testTopDepositors() (gas: 183144)
+UUPSProxyFactoryTest:test_DeployProxyAndUpgrade() (gas: 267690)

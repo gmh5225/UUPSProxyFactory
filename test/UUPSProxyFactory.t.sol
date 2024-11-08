@@ -9,6 +9,8 @@ import { UUPSUpgradeable } from "@openzeppelin-upgradeable/contracts/proxy/utils
 import { Initializable } from "@openzeppelin-upgradeable/contracts/proxy/utils/Initializable.sol";
 import { OwnableUpgradeable } from "@openzeppelin-upgradeable/contracts/access/OwnableUpgradeable.sol";
 import { ReentrancyGuardUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/ReentrancyGuardUpgradeable.sol";
+import { ReentrancyGuardTransientUpgradeable } from
+    "@openzeppelin-upgradeable/contracts/utils/ReentrancyGuardTransientUpgradeable.sol";
 import { PausableUpgradeable } from "@openzeppelin-upgradeable/contracts/utils/PausableUpgradeable.sol";
 
 contract TestImplementation is Initializable, UUPSUpgradeable, OwnableUpgradeable {
@@ -50,6 +52,7 @@ contract TestImplementationV2 is
     function initialize(address initialOwner_, uint256 value_) public reinitializer(2) {
         __Ownable_init(initialOwner_);
         __UUPSUpgradeable_init();
+        __ReentrancyGuard_init();
         value = value_;
     }
 
@@ -73,7 +76,7 @@ contract TestImplementationV3 is
     Initializable,
     UUPSUpgradeable,
     OwnableUpgradeable,
-    ReentrancyGuardUpgradeable,
+    ReentrancyGuardTransientUpgradeable,
     PausableUpgradeable
 {
     uint256 public value;
@@ -86,6 +89,7 @@ contract TestImplementationV3 is
     function initialize(address initialOwner_, uint256 value_) public reinitializer(3) {
         __Ownable_init(initialOwner_);
         __UUPSUpgradeable_init();
+        __ReentrancyGuardTransient_init();
         value = value_;
     }
 
